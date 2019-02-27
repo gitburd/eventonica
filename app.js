@@ -2,6 +2,11 @@ const inquirer = require('inquirer');
 //connection available to all
 const connection = require('./connection');
 
+const eventfulKey = require("./keys.js").eventful;
+const eventful = require('eventful-node');
+const client = new eventful.Client(eventfulKey);
+const request = require('request-promise')
+
 const app = {};
 
 app.startQuestion = (closeConnectionCallback) => {
@@ -34,10 +39,30 @@ app.startQuestion = (closeConnectionCallback) => {
   })
 }
 
+const questions =
+[
+  {
+  type: 'input',
+  name: 'flavor',
+  message: 'what is your favorite flavor?',
+  default : 'strawberries'
+},
+{
+  type: 'input',
+  name: 'animal',
+  message: 'what is your favorite animal?',
+  default : 'cat'
+}
+];
+
 app.completeSentence = (continueCallback) => {
-  //YOUR WORK HERE
-  console.log('Please write code for this function');
-  //End of your work
+  
+  inquirer.prompt(questions).then(answers => {
+  //  console.log(console.log('\nAnswers.animal'));
+  //  console.log(JSON.stringify(answers, null, ' -- '));
+      console.log('I once knew a ' + answers.animal +' that smelled like ' +answers.flavor);
+});
+
   continueCallback();
 }
 
@@ -50,11 +75,59 @@ app.createNewUser = (continueCallback) => {
 
 }
 
-app.searchEventful = (continueCallback) => {
-  //YOUR WORK HERE
+const eventQuestions =
+[
+  {
+  type: 'input',
+  name: 'type',
+  message: 'what type of event are you looking for?',
+  default : 'dance'
+},
+{
+  type: 'input',
+  name: 'location',
+  message: 'Where would you like the even to tak place?',
+  default : 'San Francisco'
+}, 
+{
+  type: 'input',
+  name: 'numberOfEvents',
+  message: 'How many events would you like returned?',
+  default : '5',
+}
+];
 
-  console.log('Please write code for this function');
-  //End of your work
+
+app.searchEventful = (continueCallback) => {
+  
+  inquirer.prompt(eventQuestions).then(event => {
+      console.log('I want to ' + event.type +' in ' + event.location);
+      client.searchEvents({
+        keywords: event.type,
+        location: event.location,
+        date: "Next Week",
+        
+      }, function(err, data){
+         if(err){
+           return console.error(err);
+         }
+        //  Number(answers.numOfEvents)
+         
+         let resultEvents = data.search.events.event;
+         console.log('Received ' + data.search.total_items + ' events');
+         console.log('Event listings: ');
+         for ( let i =0 ; i <1; i++){
+           console.log("===========================================================")
+           console.log('title: ',resultEvents[i].title);
+           console.log('start_time: ',resultEvents[i].start_time);
+           console.log('venue_name: ',resultEvents[i].venue_name);
+           console.log('venue_address: ',resultEvents[i].venue_address);
+         
+        }
+      });
+  
+  });
+
   continueCallback();
 }
 
