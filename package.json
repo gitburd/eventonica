@@ -1,7 +1,10 @@
 {
   "dependencies": {
     "eventful-node": "^1.1.1",
+    "fetch": "^1.1.0",
     "inquirer": "^5.2.0",
-    "pg": "^7.8.1"
+    "node-fetch": "^2.3.0",
+    "pg": "^7.8.1",
+    "request": "^2.88.0"
   }
 }
